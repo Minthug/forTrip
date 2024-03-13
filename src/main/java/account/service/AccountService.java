@@ -1,9 +1,12 @@
 package account.service;
 
 import account.dto.AccountUpdateDto;
+import account.dto.EmailCheckDto;
 import account.entity.Account;
 import global.advice.BusinessLogicException;
 import global.exceptionCode.ExceptionCode;
+import global.exceptionCode.NotFoundException;
+import global.exceptionCode.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,37 +23,40 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final AccountUpdateDto accountUpdateDto;
 
-//    @Transactional
-//    public Long join(Account account) {
-//        validateDuplicateAccount(account);
-//            accountRepository.save(account);
-//            return account.getId();
-//
-//    }
-
-    //Exception
-//    private void validateDuplicateAccount(Account account) {
-//        List<Account> findAccount = accountRepository.findByName(account.getName());
-//        if(!findAccount.isEmpty()) {
-//            throw new IllegalStateException("This member already exists.");
-//        }
-//    }
 
     // View all members
-    public List<Account> findAccount() {
+    @Transactional(readOnly = true)
+    public List<Account> findAll() {
         return accountRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
+    public Account findByEmail(String email) {
+        return accountRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Can't find user"));
+    }
+
     // View member
-    public Account findOne(Long accountId) {
+    @Transactional(readOnly = true)
+    public Account findById(Long accountId) {
         return accountRepository.findById(accountId).get();
     }
 
     // Edit Member
     @Transactional
     public Account update(AccountUpdateDto accountUpdateDto, Long id) {
-        Account account = accountRepository.findById(id).get();
-        return account.updateAccount(accountUpdateDto);
+        Account account = findById(id);
+        return account.updateAccount(accountUpdateDto); //, passwordEncoder);
+    }
+
+    @Transactional
+    public void completeSignUp(EmailCheckDto emailCheckDto) {
+        Account account = findByEmail(emailCheckDto.getEmail());
+
+        if (!account.isValidEmailCode(emailCheckDto.getCode())) {
+            throw new NotFoundException("이메일 인증 코드가 틀립니다.");
+        }
+        account.completeSignUp();
     }
 
     @Transactional

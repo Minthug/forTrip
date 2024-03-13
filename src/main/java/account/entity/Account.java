@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -28,13 +29,16 @@ public class Account extends BaseTime {
     private String password;
     private String country; // 스크롤 선택?
     private LocalDateTime createDay;
+
+    @Column(name = "emailCode")
+    private String emailCode;
+
+    @Column(name = "emailVerified")
+    private Boolean emailVerified;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "accountRole")
     private AccountRole role;
-
-    public Account(Long id) {
-        this.id = id;
-    }
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.REMOVE)
     private List<Article> articleList = new ArrayList<>();
@@ -52,20 +56,30 @@ public class Account extends BaseTime {
     * */
 
     @Builder
-    public Account(Long id, String email, String nickname, int age, String password, String country, LocalDateTime createDay, AccountRole role) {
+    public Account(Long id, String email, String nickname, int age, String password, String country, AccountRole role) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;
         this.age = age;
         this.password = password;
         this.country = country;
-        this.createDay = createDay;
+        this.emailCode = UUID.randomUUID().toString();
+        this.emailVerified = false;
         this.role = role;
+        this.role = role == null ? AccountRole.ROLE_USER : role;
     }
 
     public Account updateAccount(AccountUpdateDto accountUpdateDto) {
         this.nickname = accountUpdateDto.getNickname();
         this.password = accountUpdateDto.getPassword();
         return this;
+    }
+
+    public boolean isValidEmailCode(String code) {
+        return this.emailCode.equals(code);
+    }
+
+    public void completeSignUp() {
+        this.emailVerified = true;
     }
 }

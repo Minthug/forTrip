@@ -14,6 +14,7 @@ spring:
     properties:
       hibernate:
         default_batch_fetch_size: 100
+
   data:
     web:
       pageable:
@@ -28,6 +29,21 @@ spring:
                     community:
                       dialect:
                         SQLiteDialect:
+
+  # mail
+  mail:
+    # Google smtp server ??
+    host: smtp.gmail.com
+    port: 587
+    username: #? ???? ???? google ??
+    password:  #???? ? ????
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+          auth: true
+
 #jwt:
 #  key:
 #    secret: ${JWT_SECRET_KEY}
