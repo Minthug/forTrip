@@ -4,7 +4,6 @@ import account.repository.AccountRepository;
 import article.entity.Article;
 import article.entity.RecommendArticle;
 import article.repository.ArticleRepository;
-import article.repository.RecommendVoteRepository;
 import global.advice.BusinessLogicException;
 import global.exceptionCode.ExceptionCode;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,7 @@ import java.util.Optional;
 public class ArticleService {
     private final ArticleRepository articleRepository;
     private final AccountRepository accountRepository;
-    private final RecommendVoteRepository recommendVoteRepository;
+//    private final RecommendVoteRepository recommendVoteRepository;
 
     @Transactional
     public Article addArticle(Article article) {
