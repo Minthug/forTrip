@@ -41,7 +41,7 @@ public class ReactionService {
                .build();
 
        reactionRepository.save(reaction);
-       articleRepository.addReactionCount(article);
+//       articleRepository.addReactionCount(article);
 
    }
 }

@@ -23,6 +23,7 @@ public class ArticleResDto extends BaseTime {
     private String hashTag;
     private Integer reactionCount;
     private Integer commentCount;
+
     private Boolean isSecret;
     private List<CommentResDto> commentResDtos;
 

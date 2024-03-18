@@ -1,3 +1,4 @@
+//
 //package article.repository;
 //
 //import article.dto.ArticleResDto;
@@ -19,9 +20,11 @@
 //
 //    @Override
 //    public PageImpl<ArticleResDto> getArticleList(String query, Pageable pageable) {
-//        List<Article> articleList = queryFactory
-//                .selectFrom()
 //
+//        List<Article> articleList = queryFactory
+//                .selectFrom();
+//
+//        return null;
 //    }
 //
 //    @Override

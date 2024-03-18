@@ -1,51 +1,35 @@
-server:
-  port: 8080
-  servlet:
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
-
 spring:
+  h2:
+    console:
+      enabled: true
+      path: /h2
+  datasource:
+    url: jdbc:mysql://localhost:3306/crushkorea
+    username: fortrip
+    password:
+
   jpa:
     hibernate:
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      ddl-auto: create
     properties:
       hibernate:
+        format_sql: true
         default_batch_fetch_size: 100
+  profiles:
+    active: local # 사용할 환경 설정
+    include: secret
 
-  data:
-    web:
-      pageable:
-        default-page-size: 10
-        one-indexed-parameters: true
-        spring:
-          jpa:
-            properties:
-              hibernate:
-                dialect=org:
-                  hibernate:
-                    community:
-                      dialect:
-                        SQLiteDialect:
+  #상시 적용하기에 나쁘지 않다. 페이징 한계돌파 옵션
+  #        default_batch_fetch_size Max = 1000
+  # 적정 권장 사이즈는 100 ~ 1000 사이
+  # 정답은 없지만, 앱과 DB의 부담을 주지않는 선에서 조금씩 늘려보는 것도 나쁘지않다.
+  # 100 이든 1000이든 데이터를 로딩해야하므로 메모리 사용량은 같다
 
-  # mail
-  mail:
-    # Google smtp server ??
-    host: smtp.gmail.com
-    port: 587
-    username: #? ???? ???? google ??
-    password:  #???? ? ????
-    properties:
-      mail:
-        smtp:
-          starttls:
-            enable: true
-          auth: true
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
 
-#jwt:
-#  key:
-#    secret: ${JWT_SECRET_KEY}
-#  access-token-expiration-minutes: 1440
-#  refresh-token-expiration-minutes: 1440
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type: trace

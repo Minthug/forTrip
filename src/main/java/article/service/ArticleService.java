@@ -1,18 +1,22 @@
 package article.service;
 
+import account.entity.Account;
 import account.repository.AccountRepository;
+import article.dto.ArticleReqDto;
 import article.entity.Article;
-import article.entity.RecommendArticle;
+import article.mapper.ArticleReqMapper;
 import article.repository.ArticleRepository;
+import comment.repository.CommentRepository;
 import global.advice.BusinessLogicException;
 import global.exceptionCode.ExceptionCode;
+import global.exceptionCode.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.List;
+
+import static lombok.Lombok.checkNotNull;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +24,14 @@ import java.util.Optional;
 public class ArticleService {
     private final ArticleRepository articleRepository;
     private final AccountRepository accountRepository;
-//    private final RecommendVoteRepository recommendVoteRepository;
+    private final ArticleReqMapper articleReqMapper;
+    private final CommentRepository commentRepository;
+
+    @Transactional(readOnly = true)
+    public Article findById(Long id) {
+        checkNotNull(id, "articleId must be provided");
+        return articleRepository.findById(id).orElseThrow(() -> new NotFoundException("could not found article id : " + id));
+    }
 
     @Transactional
     public Article addArticle(Article article) {
@@ -31,69 +42,34 @@ public class ArticleService {
         return articleRepository.save(article);
     }
 
-//    public void modifyArticle(Article article){}
-
-    @Transactional
-    public void removeArticle(Long loginAccountId, Long articleId) {
-        accountRepository.findById(loginAccountId)
-                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.NOT_FOUND_ACCOUNT));
-
-        Article findArticle = articleRepository.findByIdWithAll(articleId)
-                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.NOT_FOUND_ARTICLE));
-
-        verifyAccess(findArticle, loginAccountId);
-
-//        commentRepository.deleteAll(findArticle.getComment());
-//        recommendVoteRepository.deleteAll(findArticle.getRecommendVote());
-        articleRepository.delete(findArticle);
-    }
-
-    public Article findArticle(Long articleId) {
-        return articleRepository.findByIdWithAll(articleId)
-                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.NOT_FOUND_ARTICLE));
-    }
-
-    public Page<Article> findArticles(String keyword, Pageable pageable) {
-        return articleRepository.searchByTitleWithAll(keyword, pageable);
-    }
-
-    public Page<Article> findAccountArticles(Long accountId, Pageable pageable) {
-        return articleRepository.findByAccountWithAll(accountId, pageable);
+    public List<Article> findAll() {
+        return articleRepository.findAll();
     }
 
     @Transactional
-    public String voteArticle(RecommendArticle recommendArticle) {
+    public Article insert(ArticleReqDto articleReqDto) {
+        Account account = accountRepository.findById(articleReqDto.getAccountId())
+                .orElseThrow(() -> new NotFoundException("Could not found account id : " + articleReqDto.getAccountId()));
 
-        verifyArticleVoteField(recommendArticle);
+        Article article = ArticleReqMapper.INSTANCE.toEntity(articleReqDto);
+        article.updateAccount(account);
 
-        Long accountId = recommendArticle.getAccount().getId();
-        Long articleId = recommendArticle.getArticle().getId();
-        Optional<RecommendArticle> findOptionalArticleVote =
-                recommendVoteRepository.findByArticleAndAccount(accountId, articleId);
-
-        if(findOptionalArticleVote.isEmpty()) {
-            recommendVoteRepository.save(recommendArticle);
-            return "success vote";
-        }
-
-        RecommendArticle findArticleVote = findOptionalArticleVote.get();
-
-        if(recommendArticle.getState().equals(findArticleVote.getState())) {
-            recommendVoteRepository.delete(findArticleVote);
-            return "cancel vote";
-        } else {
-            throw new BusinessLogicException(ExceptionCode.ILLEGAL_VOTE);
-        }
+        return articleRepository.save(article);
     }
 
-    private void verifyArticleVoteField(RecommendArticle recommendArticle) {
-        accountRepository.findById(recommendArticle.getAccount().getId())
-                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.NOT_FOUND_ACCOUNT));
+    @Transactional
+    public Article update(ArticleReqDto articleReqDto, Long id) {
+        Article article = findById(id);
 
-        articleRepository.findById(recommendArticle.getArticle().getId())
-                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.NOT_FOUND_ARTICLE));
+        return article.updateArticle(articleReqDto);
     }
 
+    @Transactional
+    public Article delete(long id) {
+        Article article = findById(id);
+        articleRepository.delete(article);
+        return article;
+    }
 
     private void verifyAccess(Article article, Long accountId) {
         if(!accountId.equals(article.getAccount().getId())) {

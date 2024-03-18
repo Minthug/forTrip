@@ -1,6 +1,7 @@
 package article.entity;
 
 import account.entity.Account;
+import article.dto.ArticleReqDto;
 import auditing.BaseTime;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -46,17 +47,39 @@ public class Article extends BaseTime {
     @JoinColumn(name = "accountId")
     private Account account;
 
-    @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE)
-    private List<RecommendArticle> articleVotes;
+    @Column(name = "isSecret", nullable = false)
+    private Boolean isSecret;
+
 
     @Builder
-    public Article(Long id, String title, String content, Account account) {
+    public Article(Long id, String title, String content, String hashTag, Integer reactionCount, Integer viewCount, Integer commentCount, Account account, Boolean isSecret) {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.hashTag = hashTag;
+        this.reactionCount = reactionCount;
+        this.viewCount = viewCount;
+        this.commentCount = commentCount;
+        this.account = account;
+        this.isSecret = isSecret;
+    }
+
+    public void updateAccount(Account account) {
         this.account = account;
     }
 
+    public Article updateArticle(ArticleReqDto articleReqDto) {
+        this.title = articleReqDto.getTitle();
+        this.hashTag = articleReqDto.getHasgTag();
+        this.content = articleReqDto.getContent();
+        this.isSecret = articleReqDto.getIsSecret();
+
+        return this;
+    }
+
+    public void viewCount(Article article) {
+        article.viewCount++;
+    }
     public void modify(Article article) {
         Optional.ofNullable(article.getTitle()).ifPresent(title -> this.title = title);
         Optional.ofNullable(article.getContent()).ifPresent(content -> this.content = content);
