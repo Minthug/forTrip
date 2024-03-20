@@ -7,7 +7,6 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -24,16 +23,10 @@ public class QAccount extends EntityPathBase<Account> {
 
     public final NumberPath<Integer> age = createNumber("age", Integer.class);
 
-    public final ListPath<article.entity.Article, article.entity.QArticle> articleList = this.<article.entity.Article, article.entity.QArticle>createList("articleList", article.entity.Article.class, article.entity.QArticle.class, PathInits.DIRECT2);
-
-    public final ListPath<comment.entity.Comment, comment.entity.QComment> commentList = this.<comment.entity.Comment, comment.entity.QComment>createList("commentList", comment.entity.Comment.class, comment.entity.QComment.class, PathInits.DIRECT2);
-
     public final StringPath country = createString("country");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createAt = _super.createAt;
-
-    public final DateTimePath<java.time.LocalDateTime> createDay = createDateTime("createDay", java.time.LocalDateTime.class);
 
     public final StringPath email = createString("email");
 

@@ -3,11 +3,13 @@ package account.service;
 import account.dto.AccountUpdateDto;
 import account.dto.EmailCheckDto;
 import account.entity.Account;
+import account.mapper.JoinMapper;
 import global.advice.BusinessLogicException;
 import global.exceptionCode.ExceptionCode;
 import global.exceptionCode.NotFoundException;
 import global.exceptionCode.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import account.repository.AccountRepository;
@@ -16,12 +18,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AccountService {
 
     private final AccountRepository accountRepository;
     private final AccountUpdateDto accountUpdateDto;
+    private final MailService mailService;
+    private final PasswordEncoder passwordEncoder;
+    private final JoinMapper joinMapper;
+
 
 
     // View all members
@@ -46,7 +51,7 @@ public class AccountService {
     @Transactional
     public Account update(AccountUpdateDto accountUpdateDto, Long id) {
         Account account = findById(id);
-        return account.updateAccount(accountUpdateDto); //, passwordEncoder);
+        return account.updateAccount(accountUpdateDto, passwordEncoder); //, passwordEncoder);
     }
 
     @Transactional

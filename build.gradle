@@ -35,6 +35,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
 	implementation 'org.apache.commons:commons-lang3'
 	implementation 'org.projectlombok:lombok:1.18.26'
 	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
@@ -63,7 +65,7 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 
 	// MySQL 데이터베이스 런타임 의존성
-	runtimeOnly 'com.mysql:mysql-connector-java'
+	runtimeOnly 'com.mysql:mysql-connector-j'
 }
 
 def querydslDir = 'src/main/generated'

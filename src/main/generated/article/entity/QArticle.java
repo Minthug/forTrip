@@ -26,6 +26,8 @@ public class QArticle extends EntityPathBase<Article> {
 
     public final account.entity.QAccount account;
 
+    public final category.entity.QCategory category;
+
     public final NumberPath<Integer> commentCount = createNumber("commentCount", Integer.class);
 
     public final StringPath content = createString("content");
@@ -67,6 +69,7 @@ public class QArticle extends EntityPathBase<Article> {
     public QArticle(Class<? extends Article> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.account = inits.isInitialized("account") ? new account.entity.QAccount(forProperty("account")) : null;
+        this.category = inits.isInitialized("category") ? new category.entity.QCategory(forProperty("category")) : null;
     }
 
 }

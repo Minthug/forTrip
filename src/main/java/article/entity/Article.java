@@ -3,7 +3,9 @@ package article.entity;
 import account.entity.Account;
 import article.dto.ArticleReqDto;
 import auditing.BaseTime;
+import category.entity.Category;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +16,8 @@ import java.util.Optional;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "article")
 public class Article extends BaseTime {
 
     @Id
@@ -50,38 +53,41 @@ public class Article extends BaseTime {
     @Column(name = "isSecret", nullable = false)
     private Boolean isSecret;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoryId")
+    private Category category;
 
     @Builder
-    public Article(Long id, String title, String content, String hashTag, Integer reactionCount, Integer viewCount, Integer commentCount, Account account, Boolean isSecret) {
+    public Article(Long id, String title, String content, String hashTag, Integer reactionCount, Integer viewCount, Boolean isSecret, Category category) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.hashTag = hashTag;
         this.reactionCount = reactionCount;
         this.viewCount = viewCount;
-        this.commentCount = commentCount;
-        this.account = account;
         this.isSecret = isSecret;
+        this.category = category;
     }
 
     public void updateAccount(Account account) {
         this.account = account;
     }
 
-    public Article updateArticle(ArticleReqDto articleReqDto) {
+    public void updateCategory(Category category) {
+        this.category = category;
+    }
+
+    public Article updateArticle(ArticleReqDto articleReqDto, Category category) {
         this.title = articleReqDto.getTitle();
-        this.hashTag = articleReqDto.getHasgTag();
+        this.hashTag = articleReqDto.getHashTag();
         this.content = articleReqDto.getContent();
         this.isSecret = articleReqDto.getIsSecret();
-
+        this.category = category;
         return this;
     }
 
     public void viewCount(Article article) {
         article.viewCount++;
     }
-    public void modify(Article article) {
-        Optional.ofNullable(article.getTitle()).ifPresent(title -> this.title = title);
-        Optional.ofNullable(article.getContent()).ifPresent(content -> this.content = content);
-    }
+
 }

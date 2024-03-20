@@ -1,22 +1,25 @@
 package article.dto;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArticleReqDto {
 
     private Long AccountId;
-    private String hasgTag;
+    private Long cateId;
+    private String hashTag;
     private String title;
     private String content;
     private Boolean isSecret;
 
 
-    public ArticleReqDto(Long accountId, String hasgTag, String title, String content, Boolean isSecret) {
+    public ArticleReqDto(Long accountId, Long cateId, String hashTag, String title, String content, Boolean isSecret) {
         AccountId = accountId;
-        this.hasgTag = hasgTag;
+        this.cateId = cateId;
+        this.hashTag = hashTag;
         this.title = title;
         this.content = content;
         this.isSecret = isSecret;

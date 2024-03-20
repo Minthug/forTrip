@@ -6,6 +6,8 @@ import article.dto.ArticleReqDto;
 import article.entity.Article;
 import article.mapper.ArticleReqMapper;
 import article.repository.ArticleRepository;
+import category.entity.Category;
+import category.repository.CategoryRepository;
 import comment.repository.CommentRepository;
 import global.advice.BusinessLogicException;
 import global.exceptionCode.ExceptionCode;
@@ -26,6 +28,7 @@ public class ArticleService {
     private final AccountRepository accountRepository;
     private final ArticleReqMapper articleReqMapper;
     private final CommentRepository commentRepository;
+    private final CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
     public Article findById(Long id) {
@@ -60,8 +63,10 @@ public class ArticleService {
     @Transactional
     public Article update(ArticleReqDto articleReqDto, Long id) {
         Article article = findById(id);
+        Category category = categoryRepository.findById(articleReqDto.getCateId())
+                .orElseThrow(() -> new NotFoundException("Could not found category id : " + articleReqDto.getCateId()));
 
-        return article.updateArticle(articleReqDto);
+        return article.updateArticle(articleReqDto, category);
     }
 
     @Transactional
